@@ -43,10 +43,7 @@ dependencies:
   awesome_dialog: ^2.1.2
   connectivity: ^3.0.6
   skeletons: ^0.0.3
-  intl: ^0.17.0
   splash_screen_view: ^3.0.0
-
-
 
 dev_dependencies:
   flutter_test:
