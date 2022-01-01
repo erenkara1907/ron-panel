@@ -9,7 +9,9 @@ class StatusRequestModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['title'] = title;
 
-    data['settings'] = settings;
+    if(data['settings'] != null){
+      data['settings'] = settings;
+    }
     data['group_id'] = group_id;
 
     return data;

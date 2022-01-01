@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:ronventory_mobile/app/core/auth_manager.dart';
+import 'package:ronventory_mobile/app/core/common_widgets/awesome_dialog.widget.dart';
 import 'package:ronventory_mobile/app/core/common_widgets/input_decoration.widget.dart';
 import 'package:ronventory_mobile/app/general/color/app_colors.dart';
 import 'package:ronventory_mobile/app/messages/category/category_messages.snackbar.dart';
@@ -45,7 +46,7 @@ class StatusGroupController extends GetxController {
     final token = _authManager.token;
     statusGroupModel = await _statusGroupRepository.statusGroupList(token!);
     statusGroupListTask.assignAll(statusGroupModel!.result!.conclusion!);
-      dataProcessing.value = false;
+    dataProcessing.value = false;
     final newToken = statusGroupModel!.result!.token;
     _authManager.enterToken(newToken);
   }
@@ -70,16 +71,30 @@ class StatusGroupController extends GetxController {
     _authManager.enterToken(newToken);
   }
 
+  /// StatusGroup Update
   AwesomeDialog statusGroupUpdateMethod(BuildContext context, int index) {
-    return AwesomeDialog(
-      context: context,
-      dialogBackgroundColor: Colors.grey.shade900,
-      animType: AnimType.SCALE,
-      dialogType: DialogType.NO_HEADER,
-      btnCancelText: '',
-      btnCancelIcon: FontAwesomeIcons.times,
-      btnOkText: '',
-      btnOkIcon: FontAwesomeIcons.paperPlane,
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
+      btnOkOnPress: () async {
+        if (titleController.text == null || titleController.text.isEmpty) {
+          StatusGroupMessages.statusGroupCreateTitleFail();
+        } else if (optionsController.text == null ||
+            optionsController.text.isEmpty) {
+          StatusGroupMessages.statusGroupCreateSettingsFail();
+        } else {
+          await statusGroupUpdate(titleController.text, optionsController.text,
+              statusGroupListTask[index].id!);
+
+          titleController.text = '';
+          optionsController.text = '';
+          await statusGroupList();
+        }
+      },
+      btnCancelOnPress: () {
+        titleController.text = '';
+        optionsController.text = '';
+        Get.off(StatusGroupView());
+      },
       body: Form(
         key: statusGroupFormKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -90,8 +105,6 @@ class StatusGroupController extends GetxController {
             Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
               child: TextFormField(
-
-
                 controller: titleController,
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
@@ -106,8 +119,6 @@ class StatusGroupController extends GetxController {
             Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
               child: TextFormField(
-
-
                 controller: optionsController,
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
@@ -119,29 +130,76 @@ class StatusGroupController extends GetxController {
           ],
         ),
       ),
-      btnCancelOnPress: () {
-        Get.off(StatusGroupView());
-        titleController.text = '';
-        optionsController.text = '';
-      },
-      btnOkOnPress: () async {
-        if (titleController.text == null || titleController.text.isEmpty) {
-          StatusGroupMessages.statusGroupCreateTitleFail();
-        }
-        else if (optionsController.text == null || optionsController.text.isEmpty){
-          StatusGroupMessages.statusGroupCreateSettingsFail();
-        }
-        else {
-          await statusGroupUpdate(
-              titleController.text,
-              optionsController.text,
-              statusGroupListTask[index].id!);
+    );
+  }
 
+  /// StatusGroup Create
+  AwesomeDialog statusGroupCreateMethod(BuildContext context) {
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
+      btnOkOnPress: () async {
+        if (titleController.text == null ||
+            titleController.text.isEmpty) {
+          StatusGroupMessages.statusGroupCreateTitleFail();
+        } else if (optionsController.text == null ||
+            optionsController.text.isEmpty) {
+        } else {
+          await statusGroupCreate(
+            titleController.text,
+            optionsController.text,
+          );
           titleController.text = '';
           optionsController.text = '';
           await statusGroupList();
+          Get.off(StatusGroupView());
         }
       },
+      btnCancelOnPress: (){
+        titleController.text = '';
+        optionsController.text = '';
+        Get.back();
+      },
+      body: Form(
+        key: statusGroupFormKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: titleController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget().inputDecoration(
+                    'Başlık', FontAwesomeIcons.envelopeOpenText),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                validator: (value) {
+                  return (value == null || value.isEmpty)
+                      ? 'Lütfen ayarları giriniz.'
+                      : null;
+                },
+                controller: optionsController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget()
+                    .inputDecoration('Ayarlar', FontAwesomeIcons.cogs),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

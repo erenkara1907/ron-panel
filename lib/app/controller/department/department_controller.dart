@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:ronventory_mobile/app/controller/settings/settings_controller.dart';
 import 'package:ronventory_mobile/app/controller/user/user_controller.dart';
 import 'package:ronventory_mobile/app/core/auth_manager.dart';
+import 'package:ronventory_mobile/app/core/common_widgets/awesome_dialog.widget.dart';
 import 'package:ronventory_mobile/app/core/common_widgets/input_decoration.widget.dart';
 import 'package:ronventory_mobile/app/general/color/app_colors.dart';
 import 'package:ronventory_mobile/app/messages/department/department_messages.sncakbar.dart';
@@ -82,8 +83,8 @@ class DepartmentController extends GetxController {
     _authManager.enterToken(newToken);
   }
 
-  Future<DepartmentResponseModel?> departmentUpdate(
-      String title, String parentType, int parentId, int adminId, int id) async {
+  Future<DepartmentResponseModel?> departmentUpdate(String title,
+      String parentType, int parentId, int adminId, int id) async {
     _authManager.bringToken();
     final token = _authManager.token;
     departmentResponseModel = await _departmentRepository.departmentUpdate(
@@ -99,16 +100,30 @@ class DepartmentController extends GetxController {
     _authManager.enterToken(newToken);
   }
 
+  /// Department Update
   AwesomeDialog departmentUpdateMethod(BuildContext context, int index) {
-    return AwesomeDialog(
-      context: context,
-      dialogBackgroundColor: Colors.grey.shade900,
-      animType: AnimType.SCALE,
-      dialogType: DialogType.NO_HEADER,
-      btnCancelText: '',
-      btnCancelIcon: FontAwesomeIcons.times,
-      btnOkText: '',
-      btnOkIcon: FontAwesomeIcons.paperPlane,
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
+      btnOkOnPress: () async {
+        if (titleController.text == null || titleController.text.isEmpty) {
+          DepartmentMessages.departmentCreateTitleFail();
+        } else {
+          Get.back();
+          await departmentUpdate(
+              titleController.text,
+              _settingsController.selectedParentType.value,
+              int.parse(_settingsController.selectedDepartmentId.value),
+              int.parse(_settingsController.selectedUserId.value),
+              departmentListTask[index].id!);
+
+          titleController.text = '';
+          await departmentList();
+        }
+      },
+      btnCancelOnPress: () {
+        Get.back();
+        titleController.text = '';
+      },
       body: Form(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
@@ -118,7 +133,6 @@ class DepartmentController extends GetxController {
             Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
               child: TextFormField(
-
                 controller: titleController,
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
@@ -131,94 +145,192 @@ class DepartmentController extends GetxController {
               height: 15,
             ),
             Obx(() => SizedBox(
-              width: Get.width/1.7,
-              height: Get.height/14,
-              child: DropdownButtonFormField<String>(decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0))),
-                hint: Text("Kullanıcı seçiniz"),
-
-                onChanged: (newValue) {
-                  _settingsController.setSelectedUserId(newValue!);
-                },
-                items: _userController.userListTask.map((map) {
-                  return DropdownMenuItem(
-                      value: map.id.toString(), child: Text("${map.name}"));
-                }).toList(),
-              ),
-            )),
-            Obx(
-                  () => SizedBox(
-                    width: Get.width/1.7,
-                    height: Get.height/14,
-                    child: DropdownButtonFormField(
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15.0))),
-
-                items: _settingsController.parentType
-                      .map((String item) => DropdownMenuItem<String>(
-                      child: Text(item), value: item))
-                      .toList(),
-                onChanged: (String? newValue) {
-                    _settingsController.setSelectedParentType(newValue!);
-                },
-                value: _settingsController.selectedParentType.value,
-              ),
+                  width: Get.width / 1.7,
+                  height: Get.height / 14,
+                  child: DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15.0))),
+                    hint: const Text("Kullanıcı seçiniz"),
+                    onChanged: (newValue) {
+                      _settingsController.setSelectedUserId(newValue!);
+                    },
+                    items: _userController.userListTask.map((map) {
+                      return DropdownMenuItem(
+                          value: map.id.toString(), child: Text("${map.name}"));
+                    }).toList(),
                   ),
+                )),
+            const SizedBox(height: 15,),
+            Obx(
+              () => SizedBox(
+                width: Get.width / 1.7,
+                height: Get.height / 14,
+                child: DropdownButtonFormField(
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0))),
+                  items: _settingsController.parentType
+                      .map((String item) => DropdownMenuItem<String>(
+                          child: Text(item), value: item))
+                      .toList(),
+                  onChanged: (String? newValue) {
+                    _settingsController.setSelectedParentType(newValue!);
+                  },
+                  value: _settingsController.selectedParentType.value,
+                ),
+              ),
             ),
             const SizedBox(
               height: 15,
             ),
             Obx(
-                  () => _settingsController.selectedParentType.value == 'child'
+              () => _settingsController.selectedParentType.value == 'child'
                   ? SizedBox(
-                    width: Get.width/1.7,
-                    height: Get.height/14,
-                    child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15.0))),
-                      hint: Text("Parent seçiniz"),
-
-                onChanged: (String? newValue) {
-                    _settingsController.setSelectedDepartmentId(newValue!);
-                },
-                items:
-                departmentListTask.map((map) {
-                    return DropdownMenuItem(
-                      value: map.id.toString(),
-                      child:
-                           Text("${map.title}")
-
-                    );
-                }).toList(),
-              ),
-                  )
+                      width: Get.width / 1.7,
+                      height: Get.height / 14,
+                      child: DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.0))),
+                        hint: const Text("Parent seçiniz"),
+                        onChanged: (String? newValue) {
+                          _settingsController
+                              .setSelectedDepartmentId(newValue!);
+                        },
+                        items: departmentListTask.map((map) {
+                          return DropdownMenuItem(
+                              value: map.id.toString(),
+                              child: Text("${map.title}"));
+                        }).toList(),
+                      ),
+                    )
                   : Text(''),
             ),
           ],
         ),
       ),
-      btnCancelOnPress: () {
-        Get.off(DepartmentView());
-        titleController.text = '';
-      },
+    );
+  }
+
+  /// Department Create
+  AwesomeDialog departmentCreateMethod(BuildContext context) {
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
       btnOkOnPress: () async {
-        if (titleController.text == null || titleController.text.isEmpty) {
-          DepartmentMessages.departmentCreateTitleFail();
+        if (titleController.text == null ||
+            titleController.text.isEmpty) {
+          DepartmentMessages.departmentCreateTitleUpdateFail();
         } else {
-          await departmentUpdate(
+          Get.off(DepartmentView());
+          await departmentCreate(
               titleController.text,
               _settingsController.selectedParentType.value,
               int.parse(_settingsController.selectedDepartmentId.value),
-              int.parse(_settingsController.selectedUserId.value),
-              departmentListTask[index].id!);
-
+              int.parse(_settingsController.selectedUserId.value));
           titleController.text = '';
+          _settingsController.selectedParentType.value = 'parent';
           await departmentList();
         }
       },
+      btnCancelOnPress: (){
+        Get.back();
+        titleController.text = '';
+        _settingsController.selectedParentType.value = 'parent';
+      },
+      body: Form(
+        key: departmentFormKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: titleController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget()
+                    .inputDecoration('Başlık?', FontAwesomeIcons.question),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Obx(
+                  () => SizedBox(
+                width: Get.width / 1.7,
+                height: Get.height / 14,
+                child: DropdownButtonFormField(
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0))),
+                  items: _settingsController.parentType
+                      .map((String item) => DropdownMenuItem<String>(
+                      child: Text(item), value: item))
+                      .toList(),
+                  onChanged: (String? newValue) {
+                    _settingsController.setSelectedParentType(newValue!);
+                  },
+                  value: _settingsController.selectedParentType.value,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Obx(
+                  () => SizedBox(
+                width: Get.width / 1.7,
+                height: Get.height / 14,
+                child: DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0))),
+                  hint: const Text('Kullanıcı seçiniz'),
+                  onChanged: (String? newValue) {
+                    _settingsController.setSelectedUserId(newValue!);
+                  },
+                  items: _userController.userListTask.map((map) {
+                    return DropdownMenuItem(
+                      value: map.id.toString(),
+                      child: Text("${map.name}"),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Obx(
+                  () => _settingsController.selectedParentType.value == 'child'
+                  ? SizedBox(
+                width: Get.width / 1.7,
+                height: Get.height / 14,
+                child: DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15.0))),
+                  hint: const Text('Departman seçiniz'),
+                  onChanged: (String? newValue) {
+                    _settingsController
+                        .setSelectedDepartmentId(newValue!);
+                  },
+                  items:
+                  departmentListTask.map((map) {
+                    return DropdownMenuItem(
+                        value: map.id.toString(),
+                        child: Text("${map.title}"));
+                  }).toList(),
+                ),
+              )
+                  : const Text(''),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

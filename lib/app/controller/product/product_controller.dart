@@ -3,7 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:ronventory_mobile/app/controller/category/category_controller.dart';
+import 'package:ronventory_mobile/app/controller/settings/settings_controller.dart';
 import 'package:ronventory_mobile/app/core/auth_manager.dart';
+import 'package:ronventory_mobile/app/core/common_widgets/awesome_dialog.widget.dart';
 import 'package:ronventory_mobile/app/core/common_widgets/input_decoration.widget.dart';
 import 'package:ronventory_mobile/app/general/color/app_colors.dart';
 import 'package:ronventory_mobile/app/messages/product/product_messages.snackbar.dart';
@@ -18,11 +21,15 @@ import 'package:ronventory_mobile/app/view/user/user_view.dart';
 class ProductController extends GetxController {
   late final AuthManager _authManager;
   late final ProductRepository _productRepository;
+  late final SettingsController _settingsController = Get.put(SettingsController());
+  late final CategoryController _categoryController = Get.put(CategoryController());
 
   var dataProcessing = false.obs;
 
   ProductModel? productModel;
   ProductResponseModel? productResponseModel;
+
+  GlobalKey<FormState> productFormKey = GlobalKey();
 
   var productListTask = <ConclusionProduct>[].obs;
   late TextEditingController titleController;
@@ -87,52 +94,166 @@ class ProductController extends GetxController {
     _authManager.enterToken(newToken);
   }
 
+  /// Product Update
   AwesomeDialog productUpdateMethod(BuildContext context, int index) {
-    return AwesomeDialog(
-        context: context,
-        dialogBackgroundColor: Colors.grey.shade900,
-        animType: AnimType.SCALE,
-        dialogType: DialogType.NO_HEADER,
-        btnCancelText: '',
-        btnCancelIcon: FontAwesomeIcons.times,
-        btnOkText: '',
-        btnOkIcon: FontAwesomeIcons.paperPlane,
-        body: Form(
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 5, right: 5),
-                child: TextFormField(
-                  controller: titleController,
-                  style: TextStyle(color: AppColors().kTextColor),
-                  cursorColor: AppColors().kCursorColor,
-                  decoration: InputDecorationWidget().inputDecoration(
-                      '${productListTask[index].title}',
-                      FontAwesomeIcons.envelopeOpenText),
-                ),
-              ),
-            ],
-          ),
-        ),
-        btnCancelOnPress: () {
-          Get.off(ProductView());
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
+      btnOkOnPress: () async {
+        if (titleController.text == null || titleController.text.isEmpty) {
+          ProductMessages.productCreateTitleUpdateFail();
+        } else {
+          Get.back();
+          await productUpdate(titleController.text, productListTask[index].id!);
+
           titleController.text = '';
-        },
-        btnOkOnPress: () async {
-          if(titleController.text == null || titleController.text.isEmpty){
-            ProductMessages.productCreateTitleUpdateFail();
-          }else{
-            await productUpdate(
-                titleController.text,
-                productListTask[index].id!);
+          await productList();
+        }
+      },
+      btnCancelOnPress: () {
+        Get.back();
+        titleController.text = '';
+      },
+      body: Form(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: titleController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget().inputDecoration(
+                    '${productListTask[index].title}',
+                    FontAwesomeIcons.envelopeOpenText),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-            titleController.text = '';
-            await productList();
-          }
-
-        });
+  /// Product Create
+  AwesomeDialog productCreateMethod(BuildContext context) {
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
+      btnOkOnPress: () async {
+        if (_settingsController.productTitleController.text == null ||
+            _settingsController.productTitleController.text.isEmpty) {
+          ProductMessages.productCreateTitleFail();
+        } else if (_settingsController.productSerialNumberController.text ==
+            null ||
+            _settingsController.productSerialNumberController.text.isEmpty) {
+          ProductMessages.productCreateSerialNumberFail();
+        } else {
+          Get.off(ProductView());
+          _settingsController.productPrice.value ==
+              _settingsController.productPriceController.text;
+          await productCreate(
+            _settingsController.productTitleController.text,
+            int.parse(_settingsController.selectedCategoryId.value),
+            _settingsController.productPrice.value,
+            _settingsController.productSerialNumberController.text,
+          );
+          _settingsController.productTitleController.text = '';
+          _settingsController.productPriceController.text = '';
+          _settingsController.productSerialNumberController.text = '';
+          _settingsController.selectedParentType.value = 'parent';
+          await productList();
+        }
+      },
+      btnCancelOnPress: (){
+        Get.back();
+        _settingsController.productTitleController.text = '';
+        _settingsController.productPriceController.text = '';
+        _settingsController.productSerialNumberController.text = '';
+      },
+      body: Form(
+        key: productFormKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: _settingsController.productTitleController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget()
+                    .inputDecoration('Ürün Adı', FontAwesomeIcons.font),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: _settingsController.productPriceController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget().inputDecoration(
+                    'Fiyat (Opsiyonel)', FontAwesomeIcons.euroSign),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: _settingsController.productSerialNumberController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget().inputDecoration(
+                    'Seri Numarası', FontAwesomeIcons.sortNumericUp),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Obx(
+                  () => Padding(
+                  padding: const EdgeInsets.only(left: 5, right: 5),
+                  child: FutureBuilder(
+                    future: _settingsController.getCategoryID(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return SizedBox(
+                          width: Get.width / 1.7,
+                          height: Get.height / 14,
+                          child: DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15.0))),
+                            hint: Text("Kategori seçiniz"),
+                            onChanged: (String? newValue) {
+                              _settingsController
+                                  .setSelectedCategoryId(newValue!);
+                            },
+                            items:
+                            _categoryController.categoryListTask.map((map) {
+                              return DropdownMenuItem(
+                                value: map.id.toString(),
+                                child: Text("${map.title}"),
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      } else {
+                        return Text("Listeye boş olduğu için ulaşılamıyor");
+                      }
+                    },
+                  )),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

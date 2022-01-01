@@ -4,7 +4,6 @@ import 'package:ronventory_mobile/app/general/color/app_colors.dart';
 import 'package:ronventory_mobile/app/general/text/app_text.style.dart';
 
 class InputDecorationWidget extends StatelessWidget {
-  const InputDecorationWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

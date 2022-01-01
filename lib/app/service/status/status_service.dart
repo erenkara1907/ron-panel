@@ -13,6 +13,7 @@ class StatusService extends GetConnect with StatusBase {
       'x-token': token,
       'x-device': 'mobile'
     });
+    print(response.body);
     return StatusResponseModel.fromJson(response.body);
   }
 

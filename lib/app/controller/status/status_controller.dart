@@ -6,9 +6,11 @@ import 'package:get/get.dart';
 import 'package:ronventory_mobile/app/controller/settings/settings_controller.dart';
 import 'package:ronventory_mobile/app/controller/status_group/status_group_controller.dart';
 import 'package:ronventory_mobile/app/core/auth_manager.dart';
+import 'package:ronventory_mobile/app/core/common_widgets/awesome_dialog.widget.dart';
 import 'package:ronventory_mobile/app/core/common_widgets/input_decoration.widget.dart';
 import 'package:ronventory_mobile/app/general/color/app_colors.dart';
 import 'package:ronventory_mobile/app/messages/status/status_messages.snackbar.dart';
+import 'package:ronventory_mobile/app/messages/status_group/status_group_messages.snackbar.dart';
 import 'package:ronventory_mobile/app/model/status/status_model.dart';
 import 'package:ronventory_mobile/app/model/status/submodel/statu_response_model.dart';
 import 'package:ronventory_mobile/app/model/status/submodel/status_request_model.dart';
@@ -51,7 +53,6 @@ class StatusController extends GetxController {
     dataProcessing.value = false;
     final newToken = statusModel!.result!.token;
     _authManager.enterToken(newToken);
-
   }
 
   Future<StatusResponseModel?> statusCreate(
@@ -59,7 +60,9 @@ class StatusController extends GetxController {
     _authManager.bringToken();
     final token = _authManager.token;
     statusResponseModel = await _statusRepository.statusCreate(
-        token!, StatusRequestModel(title: title, settings: settings, group_id: group_id));
+        token!,
+        StatusRequestModel(
+            title: title, settings: settings, group_id: group_id));
     final newToken = statusResponseModel!.result!.token;
     _authManager.enterToken(newToken);
   }
@@ -69,21 +72,44 @@ class StatusController extends GetxController {
     _authManager.bringToken();
     final token = _authManager.token;
     statusResponseModel = await _statusRepository.statusUpdate(
-        token!, StatusRequestModel(title: title, settings: settings , group_id: group_id), id);
+        token!,
+        StatusRequestModel(
+            title: title, settings: settings, group_id: group_id),
+        id);
     final newToken = statusResponseModel!.result!.token;
     _authManager.enterToken(newToken);
   }
 
+  /// Status Update
+
   AwesomeDialog statusUpdateMethod(BuildContext context, int index) {
-    return AwesomeDialog(
-      context: context,
-      dialogBackgroundColor: Colors.grey.shade900,
-      animType: AnimType.SCALE,
-      dialogType: DialogType.NO_HEADER,
-      btnCancelText: '',
-      btnCancelIcon: FontAwesomeIcons.times,
-      btnOkText: '',
-      btnOkIcon: FontAwesomeIcons.paperPlane,
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
+      btnOkOnPress: () async {
+        if (titleController.text.isEmpty || titleController.text == null) {
+          StatusMessages.statusUpdateTitleFail();
+        } else if (optionsController.text.isEmpty ||
+            optionsController.text == null) {
+          StatusMessages.statusUpdateOptionsFail();
+        } else {
+          Get.back();
+          await statusUpdate(
+            titleController.text,
+            optionsController.text,
+            int.parse(_settingsController.selectedGroupID.value),
+            statusListTask[index].id!,
+          );
+
+          titleController.text = '';
+          optionsController.text = '';
+          await statusList();
+        }
+      },
+      btnCancelOnPress: () {
+        Get.back();
+        titleController.text = '';
+        optionsController.text = '';
+      },
       body: Form(
         key: statusFormKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -94,7 +120,6 @@ class StatusController extends GetxController {
             Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
               child: TextFormField(
-
                 controller: titleController,
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
@@ -109,79 +134,141 @@ class StatusController extends GetxController {
             Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
               child: TextFormField(
-
                 controller: optionsController,
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
                 decoration: InputDecorationWidget().inputDecoration(
-                    '${statusListTask[index].title}',
-                    FontAwesomeIcons.cogs),
+                    '${statusListTask[index].settings}', FontAwesomeIcons.cogs),
               ),
-
             ),
-            SizedBox(height: 15,),
+            const SizedBox(
+              height: 15,
+            ),
             Obx(() => SizedBox(
-                width: Get.width/1.7,
-                height: Get.height/14,
+                width: Get.width / 1.7,
+                height: Get.height / 14,
                 child: FutureBuilder(
                   future: _settingsController.getGroupID(),
-                  builder: (context,snapshot){
-                    if(snapshot.hasData){
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
                       return DropdownButtonFormField<String>(
                         decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))
-                        ),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.0))),
                         hint: const Text('Statü Grup seçiniz'),
                         onChanged: (String? newID) {
-
-                            _settingsController.setSelectedGroupId(newID!);
-
+                          _settingsController.setSelectedGroupId(newID!);
                         },
-                        items: _statusGroupController.statusGroupListTask.map((map) {
+                        items: _statusGroupController.statusGroupListTask
+                            .map((map) {
                           return DropdownMenuItem<String>(
                             value: map.id.toString(),
                             child: Text("${map.title}"),
                           );
                         }).toList(),
                       );
-                    }else{
-                      return Text("Liste bulunamadı");
+                    } else {
+                      return const Text("Liste bulunamadı");
                     }
-
                   },
-                )
-            ))
+                )))
           ],
         ),
       ),
-      btnCancelOnPress: () {
-        Get.off(StatusView());
-        titleController.text = '';
-        optionsController.text = '';
-      },
+    );
+  }
+
+  /// Status Create
+  AwesomeDialog statusCreateMethod(BuildContext context) {
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
       btnOkOnPress: () async {
-        if (titleController.text.isEmpty || titleController.text == null) {
-          StatusMessages.statusUpdateTitleFail();
-        } else if(optionsController.text.isEmpty || optionsController.text == null){
-          StatusMessages.statusUpdateOptionsFail();
-        }
-
-
-        else {
-
-          await statusUpdate(
-            titleController.text,
-            optionsController.text,
-            int.parse(_settingsController.selectedGroupID.value),
-            statusListTask[index].id!,
-
-          );
-
+        if (titleController.text == null || titleController.text.isEmpty) {
+          StatusGroupMessages.statusGroupCreateTitleFail();
+        } else if (optionsController.text == null ||
+            optionsController.text.isEmpty) {
+          StatusGroupMessages.statusGroupCreateSettingsFail();
+        } else {
+          Get.off(StatusView());
+          await statusCreate(titleController.text, optionsController.text,
+              int.parse(_settingsController.selectedGroupID.value));
           titleController.text = '';
           optionsController.text = '';
           await statusList();
         }
       },
+      btnCancelOnPress: () {
+        Get.back();
+        titleController.text = '';
+        optionsController.text = '';
+      },
+      body: Form(
+        key: statusFormKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: titleController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget().inputDecoration(
+                    'Başlık', FontAwesomeIcons.envelopeOpenText),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: optionsController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget()
+                    .inputDecoration('Ayarlar', FontAwesomeIcons.cogs),
+              ),
+            ),
+            const SizedBox(
+              height: 15,
+            ),
+            Obx(
+              () => SizedBox(
+                width: Get.width / 1.7,
+                height: Get.height / 14,
+                child: FutureBuilder(
+                  future: _settingsController.getGroupID(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15.0))),
+                        hint: const Text('Statü Grup seçiniz'),
+                        onChanged: (String? newID) {
+                          _settingsController.setSelectedGroupId(newID!);
+                        },
+                        items: _statusGroupController.statusGroupListTask
+                            .map((map) {
+                          return DropdownMenuItem<String>(
+                            value: map.id.toString(),
+                            child: Text("${map.title}"),
+                          );
+                        }).toList(),
+                      );
+                    } else {
+                      return const Text("Liste bulunamadı");
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

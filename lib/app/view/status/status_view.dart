@@ -37,12 +37,6 @@ class StatusView extends GetView<StatusController> {
                     shadowColor: Colors.white,
                     children: [
                       Expanded(
-                        child: Text(
-                          controller.statusListTask[index].title!,
-                          style: AppTextStyle().kTextStyleEmail,
-                        ),
-                      ),
-                      Expanded(
                         child: TextButton(
                             onPressed: () {
                               controller

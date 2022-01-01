@@ -52,6 +52,7 @@ class CategoryView extends GetView<CategoryController> {
                                         .categoryUpdateMethod(context, index)
                                         .show();
                                     await _settingsController.getSettings();
+
                                   },
                                   child: const Text(
                                     'Güncelle',

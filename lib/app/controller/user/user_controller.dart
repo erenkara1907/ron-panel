@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:ronventory_mobile/app/controller/settings/settings_controller.dart';
 import 'package:ronventory_mobile/app/core/auth_manager.dart';
+import 'package:ronventory_mobile/app/core/common_widgets/awesome_dialog.widget.dart';
 import 'package:ronventory_mobile/app/core/common_widgets/input_decoration.widget.dart';
 import 'package:ronventory_mobile/app/general/color/app_colors.dart';
 import 'package:ronventory_mobile/app/messages/user/user_messages.snackbar.dart';
@@ -19,7 +20,8 @@ import 'package:ronventory_mobile/app/view/user/user_view.dart';
 class UserController extends GetxController {
   late final AuthManager _authManager;
   late final UserRepository _userRepository;
-
+  late final SettingsController _settingsController =
+      Get.put(SettingsController());
 
   var dataProcessing = false.obs;
 
@@ -31,7 +33,6 @@ class UserController extends GetxController {
 
   UserCreateResponseModel? userCreateResponseModel;
   UserUpdateResponseModel? userUpdateResponseModel;
-  SettingsController? _settingsController;
 
   late TextEditingController emailController,
       passwordController,
@@ -42,7 +43,6 @@ class UserController extends GetxController {
     super.onInit();
     _authManager = Get.put(AuthManager());
     _userRepository = Get.put(UserRepository());
-    _settingsController = Get.put(SettingsController());
     emailController = TextEditingController();
     passwordController = TextEditingController();
     nameController = TextEditingController();
@@ -74,6 +74,7 @@ class UserController extends GetxController {
     final newToken = userCreateResponseModel!.result!.token;
     _authManager.enterToken(newToken);
   }
+
   Future<UserCreateResponseModel?> userUpdate(
       String name, String email, String password, int id) async {
     _authManager.bringToken();
@@ -86,16 +87,40 @@ class UserController extends GetxController {
     _authManager.enterToken(newToken);
   }
 
+  /// User Update
   AwesomeDialog userUpdateMethod(BuildContext context, int index) {
-    return AwesomeDialog(
-      context: context,
-      dialogBackgroundColor: Colors.grey.shade900,
-      animType: AnimType.SCALE,
-      dialogType: DialogType.NO_HEADER,
-      btnCancelText: '',
-      btnCancelIcon: FontAwesomeIcons.times,
-      btnOkText: '',
-      btnOkIcon: FontAwesomeIcons.paperPlane,
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
+      btnOkOnPress: () async {
+        if (nameController.text.isEmpty) {
+          UserMessages.userCreateNameFail();
+        } else if (emailController.text.isEmpty ||
+            emailController.text.length < 6) {
+          UserMessages.userCreateEmailFail();
+        } else if (!emailController.text.contains("@")) {
+          UserMessages.userCreateEmailContainFail();
+        } else if (passwordController.text.length < 6) {
+          UserMessages.userCreatePasswordFail();
+        } else {
+          await userUpdate(
+            nameController.text,
+            emailController.text,
+            passwordController.text,
+            userListTask[index].id!,
+          );
+          emailController.text = "";
+          passwordController.text = "";
+          nameController.text = "";
+          UserMessages.userUpdateSuccess();
+          await userList();
+        }
+      },
+      btnCancelOnPress: () {
+        emailController.text = "";
+        passwordController.text = "";
+        nameController.text = "";
+        Get.off(UserView());
+      },
       body: Form(
         key: userFormKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -106,13 +131,11 @@ class UserController extends GetxController {
             Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
               child: TextFormField(
-
-
                 controller: nameController,
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
-                decoration: InputDecorationWidget().inputDecoration(
-                    'Kullanıcı Adı?', FontAwesomeIcons.user),
+                decoration: InputDecorationWidget()
+                    .inputDecoration('Kullanıcı Adı?', FontAwesomeIcons.user),
               ),
             ),
             const SizedBox(
@@ -121,12 +144,11 @@ class UserController extends GetxController {
             Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
               child: TextFormField(
-
                 controller: emailController,
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
-                decoration:
-                InputDecorationWidget().inputDecoration('Email?', FontAwesomeIcons.mailBulk),
+                decoration: InputDecorationWidget()
+                    .inputDecoration('Email?', FontAwesomeIcons.mailBulk),
               ),
             ),
             const SizedBox(
@@ -134,86 +156,139 @@ class UserController extends GetxController {
             ),
             Padding(
                 padding: const EdgeInsets.only(left: 5, right: 5),
-                child:Obx(()=>
-                    TextFormField(
-                      obscureText: _settingsController!.isObscure.value,
-                      controller: passwordController,
-                      style: TextStyle(color: AppColors().kTextColor),
-                      cursorColor: AppColors().kCursorColor,
-                      decoration:
-                      InputDecorationWidget().inputDecoration(
-                        'Parola?', FontAwesomeIcons.lock,
-                        suffixIcon: IconButton(
-                          onPressed: () {
-
-                            _settingsController!.isObscure.value = !_settingsController!.isObscure.value;
-
-                          },
-                          icon: _settingsController!.isObscure.value == true
-                              ? const Icon(
-                            Icons.visibility_off,
-                          )
-                              : const Icon(
-                            Icons.visibility,
-                            color: Colors.white,
-                          ),
-                        ),
-
-
-
+                child: Obx(
+                  () => TextFormField(
+                    obscureText: _settingsController.isObscure.value,
+                    controller: passwordController,
+                    style: TextStyle(color: AppColors().kTextColor),
+                    cursorColor: AppColors().kCursorColor,
+                    decoration: InputDecorationWidget().inputDecoration(
+                      'Parola?',
+                      FontAwesomeIcons.lock,
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          _settingsController.isObscure.value =
+                              !_settingsController.isObscure.value;
+                        },
+                        icon: _settingsController.isObscure.value == true
+                            ? const Icon(
+                                Icons.visibility_off,
+                              )
+                            : const Icon(
+                                Icons.visibility,
+                                color: Colors.white,
+                              ),
                       ),
                     ),
-
-                )
-            ),
+                  ),
+                )),
             const SizedBox(
               height: 10,
             ),
           ],
         ),
       ),
-      btnCancelOnPress: () {
-        emailController.text="";
-        passwordController.text="";
-        nameController.text="";
-        Get.off(UserView());
-      },
+    );
+  }
+
+  /// User Create
+  AwesomeDialog userCreateMethod(BuildContext context) {
+    return AwesomeDialogWidget().awesomeDialog(
+      context,
       btnOkOnPress: () async {
         if (nameController.text.isEmpty) {
           UserMessages.userCreateNameFail();
-
-        } else if(emailController.text.isEmpty || emailController.text.length<6){
+        } else if (emailController.text.isEmpty ||
+            emailController.text.length < 6) {
           UserMessages.userCreateEmailFail();
-
-        }
-        else if(!emailController.text.contains("@")){
+        } else if (!emailController.text.contains("@")) {
           UserMessages.userCreateEmailContainFail();
-
-        }
-
-        else if(passwordController.text.length<6){
+        } else if (passwordController.text.length < 6) {
           UserMessages.userCreatePasswordFail();
-
-        }
-
-        else {
-
-          await userUpdate(
-              nameController.text,
-              emailController.text,
-              passwordController.text,
-
-              userListTask[index].id!,
-
-
-          );
-          emailController.text="";
-          passwordController.text="";
-          nameController.text="";
-          UserMessages.userUpdateSuccess();
+        } else {
+          UserMessages.userCreateSuccess();
+          await userCreate(emailController.text, passwordController.text,
+              nameController.text);
+          nameController.text = '';
+          emailController.text = '';
+          passwordController.text = '';
           await userList();
+          Get.off(UserView());
         }
       },
+      btnCancelOnPress: () {
+        nameController.text = '';
+        emailController.text = '';
+        passwordController.text = '';
+        Get.back();
+      },
+      body: Form(
+        key: userFormKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: nameController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget()
+                    .inputDecoration('Kullanıcı Adı?', FontAwesomeIcons.user),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: TextFormField(
+                controller: emailController,
+                style: TextStyle(color: AppColors().kTextColor),
+                cursorColor: AppColors().kCursorColor,
+                decoration: InputDecorationWidget()
+                    .inputDecoration('Email?', FontAwesomeIcons.mailBulk),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+                padding: const EdgeInsets.only(left: 5, right: 5),
+                child: Obx(
+                  () => TextFormField(
+                    obscureText: _settingsController.isObscure.value,
+                    controller: passwordController,
+                    style: TextStyle(color: AppColors().kTextColor),
+                    cursorColor: AppColors().kCursorColor,
+                    decoration: InputDecorationWidget().inputDecoration(
+                      'Parola?',
+                      FontAwesomeIcons.lock,
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          _settingsController.isObscure.value =
+                              !_settingsController.isObscure.value;
+                        },
+                        icon: _settingsController.isObscure.value == true
+                            ? const Icon(
+                                Icons.visibility_off,
+                              )
+                            : const Icon(
+                                Icons.visibility,
+                                color: Colors.white,
+                              ),
+                      ),
+                    ),
+                  ),
+                )),
+            const SizedBox(
+              height: 10,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

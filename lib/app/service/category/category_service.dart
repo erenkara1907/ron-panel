@@ -10,32 +10,24 @@ class CategoryService extends GetConnect with CategoryBase {
   @override
   Future<CategoryResponseModel?> categoryCreate(
       String token, CategoryCreateRequestModel model) async {
-    final response = await post(categoryCreateUrl, model.toJson(), headers: {
-      'x-token': token,
-      'x-device': 'mobile'
-    });
+    final response = await post(categoryCreateUrl, model.toJson(),
+        headers: {'x-token': token, 'x-device': 'mobile'});
 
-    print(response.body);
     return CategoryResponseModel.fromJson(response.body);
   }
 
   @override
   Future<CategoryResponseModel?> categoryDelete(
       String token, CategoryCreateRequestModel model, int id) async {
-    final response =
-        await post('$categoryDeleteUrl/$id', model.toJson(), headers: {
-      'x-token': token,
-          'x-device': 'mobile'
-    });
+    final response = await post('$categoryDeleteUrl/$id', model.toJson(),
+        headers: {'x-token': token, 'x-device': 'mobile'});
     return CategoryResponseModel.fromJson(response.body);
   }
 
   @override
   Future<CategoryModel?> categoryInfo(String token, CategoryModel model) async {
-    final response = await post(categoryInfoUrl, model.toJson(), headers: {
-      'x-token': token,
-      'x-device': 'mobile'
-    });
+    final response = await post(categoryInfoUrl, model.toJson(),
+        headers: {'x-token': token, 'x-device': 'mobile'});
     return CategoryModel.fromJson(response.body);
   }
 
@@ -43,10 +35,8 @@ class CategoryService extends GetConnect with CategoryBase {
   Future<CategoryModel?> categoryList(
     String token,
   ) async {
-    final response = await get(categoryListUrl, headers: {
-      'x-token': token,
-      'x-device': 'mobile'
-    });
+    final response = await get(categoryListUrl,
+        headers: {'x-token': token, 'x-device': 'mobile'});
 
     return CategoryModel.fromJson(response.body);
   }
@@ -54,21 +44,16 @@ class CategoryService extends GetConnect with CategoryBase {
   @override
   Future<CategoryModel?> categoryProduct(
       String token, CategoryModel model) async {
-    final response = await post(categoryProductUrl, model.toJson(), headers: {
-      'x-token': token,
-      'x-device': 'mobile'
-    });
+    final response = await post(categoryProductUrl, model.toJson(),
+        headers: {'x-token': token, 'x-device': 'mobile'});
     return CategoryModel.fromJson(response.body);
   }
 
   @override
   Future<CategoryResponseModel?> categoryUpdate(
       String token, CategoryUpdateRequestModel model, int id) async {
-    final response =
-        await post("$categoryUpdateUrl/$id", model.toJson(), headers: {
-      'x-token': token,
-          'x-device': 'mobile'
-    });
+    final response = await post("$categoryUpdateUrl/$id", model.toJson(),
+        headers: {'x-token': token, 'x-device': 'mobile'});
 
     return CategoryResponseModel.fromJson(response.body);
   }

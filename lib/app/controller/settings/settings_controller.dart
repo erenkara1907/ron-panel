@@ -78,7 +78,6 @@ class SettingsController extends GetxController {
   }
 
   Future<SettingsModel?> getSettings() async {
-    print('GİRDİİİ ');
     dataProcessing.value = true;
     await _authManager.bringToken();
     final token = _authManager.token;
