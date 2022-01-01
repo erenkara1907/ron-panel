@@ -207,6 +207,7 @@ class UserController extends GetxController {
         } else if (passwordController.text.length < 6) {
           UserMessages.userCreatePasswordFail();
         } else {
+          Get.back();
           Get.off(UserView());
           UserMessages.userCreateSuccess();
           await userCreate(emailController.text, passwordController.text,

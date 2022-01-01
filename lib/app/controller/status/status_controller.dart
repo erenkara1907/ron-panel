@@ -167,6 +167,7 @@ class StatusController extends GetxController {
         if (titleController.text == null || titleController.text.isEmpty) {
           StatusGroupMessages.statusGroupCreateTitleFail();
         } else {
+          Get.back();
           Get.off(StatusView());
           await statusCreate(titleController.text, 'a',
               int.parse(_settingsController.selectedGroupID.value));

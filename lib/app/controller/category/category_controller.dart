@@ -202,13 +202,14 @@ class CategoryController extends GetxController {
         if (titleController.text.isEmpty || titleController.text == null) {
           CategoryMessages.categoryCreateTitleFail();
         } else {
+          Get.back();
+          Get.off(CategoryView());
           await categoryCreate(
               titleController.text,
               _settingsController.selectedParentType.value,
               int.parse(_settingsController.selectedCategoryId.value));
 
           await categoryList();
-          Get.off(CategoryView());
           titleController.text = '';
           _settingsController.selectedParentType.value = 'parent';
         }

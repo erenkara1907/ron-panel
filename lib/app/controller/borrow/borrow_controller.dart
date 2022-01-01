@@ -22,7 +22,8 @@ class BorrowController extends GetxController {
   late final AuthManager _authManager;
   late final BorrowRepository _borrowRepository;
   late final SettingsController _settingsController;
-  late final ProductController _productController = Get.put(ProductController());
+  late final ProductController _productController =
+      Get.put(ProductController());
   late final UserController _userController = Get.put(UserController());
 
   var dataProcessing = false.obs;
@@ -97,7 +98,10 @@ class BorrowController extends GetxController {
         } else if (formattedDate! == '' || formattedDate!.isEmpty) {
           BorrowMessages.borrowCreateDateFail();
           _settingsController.borrowDescriptionController.text = '';
+        } else if (borrowFormKey.currentState?.validate() ?? false) {
+          BorrowMessages.borrowCreateFail();
         } else {
+          Get.back();
           Get.off(BorrowView());
           await borrowCreate(
             int.parse(_settingsController.selectedUserId.value),
@@ -116,7 +120,7 @@ class BorrowController extends GetxController {
       },
       body: Form(
         key: borrowFormKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
+        autovalidateMode: AutovalidateMode.always,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -179,9 +183,14 @@ class BorrowController extends GetxController {
               height: 10,
             ),
             Obx(
-                  () => Padding(
+              () => Padding(
                 padding: const EdgeInsets.only(left: 5, right: 5),
                 child: DropdownButtonFormField<String>(
+                  validator: (value) {
+                    return (value == null || value.isEmpty)
+                        ? 'Lütfen gerekli alanı doldurunuz'
+                        : null;
+                  },
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.0))),
@@ -194,9 +203,9 @@ class BorrowController extends GetxController {
                       value: map.id.toString(),
                       child: Center(
                           child: Center(
-                            child: SizedBox(
-                                width: Get.width / 2, child: Text("${map.name}")),
-                          )),
+                        child: SizedBox(
+                            width: Get.width / 2, child: Text("${map.name}")),
+                      )),
                     );
                   }).toList(),
                 ),
@@ -206,13 +215,18 @@ class BorrowController extends GetxController {
               height: 15,
             ),
             Obx(
-                  () => Padding(
+              () => Padding(
                   padding: const EdgeInsets.only(left: 5, right: 5),
                   child: FutureBuilder(
                     future: _settingsController.getProductID(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return DropdownButtonFormField<String>(
+                          validator: (value) {
+                            return (value == null || value.isEmpty)
+                                ? 'Lütfen gerekli alanı doldurunuz'
+                                : null;
+                          },
                           decoration: InputDecoration(
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(15.0))),
@@ -235,7 +249,8 @@ class BorrowController extends GetxController {
                           }).toList(),
                         );
                       } else {
-                        return const Text("Listeye boş olduğu için ulaşılamıyor");
+                        return const Text(
+                            "Listeye boş olduğu için ulaşılamıyor");
                       }
                     },
                   )),

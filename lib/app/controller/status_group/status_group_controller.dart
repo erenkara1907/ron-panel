@@ -145,6 +145,7 @@ class StatusGroupController extends GetxController {
         } else if (optionsController.text == null ||
             optionsController.text.isEmpty) {
         } else {
+          Get.back();
           Get.off(StatusGroupView());
           await statusGroupCreate(
             titleController.text,

@@ -222,6 +222,7 @@ class DepartmentController extends GetxController {
             titleController.text.isEmpty) {
           DepartmentMessages.departmentCreateTitleUpdateFail();
         } else {
+          Get.back();
           Get.off(DepartmentView());
           await departmentCreate(
               titleController.text,

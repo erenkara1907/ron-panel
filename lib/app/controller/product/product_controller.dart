@@ -149,6 +149,7 @@ class ProductController extends GetxController {
             _settingsController.productSerialNumberController.text.isEmpty) {
           ProductMessages.productCreateSerialNumberFail();
         } else {
+          Get.back();
           Get.off(ProductView());
           _settingsController.productPrice.value ==
               _settingsController.productPriceController.text;
