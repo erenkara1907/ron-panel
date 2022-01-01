@@ -82,6 +82,7 @@ class StatusGroupController extends GetxController {
             optionsController.text.isEmpty) {
           StatusGroupMessages.statusGroupCreateSettingsFail();
         } else {
+          Get.back();
           await statusGroupUpdate(titleController.text, optionsController.text,
               statusGroupListTask[index].id!);
 
@@ -91,9 +92,9 @@ class StatusGroupController extends GetxController {
         }
       },
       btnCancelOnPress: () {
+        Get.back();
         titleController.text = '';
         optionsController.text = '';
-        Get.off(StatusGroupView());
       },
       body: Form(
         key: statusGroupFormKey,
@@ -144,6 +145,7 @@ class StatusGroupController extends GetxController {
         } else if (optionsController.text == null ||
             optionsController.text.isEmpty) {
         } else {
+          Get.off(StatusGroupView());
           await statusGroupCreate(
             titleController.text,
             optionsController.text,
@@ -151,13 +153,12 @@ class StatusGroupController extends GetxController {
           titleController.text = '';
           optionsController.text = '';
           await statusGroupList();
-          Get.off(StatusGroupView());
         }
       },
       btnCancelOnPress: (){
+        Get.back();
         titleController.text = '';
         optionsController.text = '';
-        Get.back();
       },
       body: Form(
         key: statusGroupFormKey,

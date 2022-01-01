@@ -28,7 +28,7 @@ class StatusController extends GetxController {
   late SettingsController _settingsController;
   late StatusGroupController _statusGroupController;
 
-  late TextEditingController titleController, optionsController;
+  late TextEditingController titleController;
 
   var statusListTask = <ConclusionStatus>[].obs;
   GlobalKey<FormState> statusFormKey = GlobalKey();
@@ -41,7 +41,6 @@ class StatusController extends GetxController {
     _statusGroupController = Get.put(StatusGroupController());
     _settingsController = Get.put(SettingsController());
     titleController = TextEditingController();
-    optionsController = TextEditingController();
   }
 
   Future<StatusModel?> statusList() async {
@@ -88,27 +87,22 @@ class StatusController extends GetxController {
       btnOkOnPress: () async {
         if (titleController.text.isEmpty || titleController.text == null) {
           StatusMessages.statusUpdateTitleFail();
-        } else if (optionsController.text.isEmpty ||
-            optionsController.text == null) {
-          StatusMessages.statusUpdateOptionsFail();
         } else {
           Get.back();
           await statusUpdate(
             titleController.text,
-            optionsController.text,
+            'a',
             int.parse(_settingsController.selectedGroupID.value),
             statusListTask[index].id!,
           );
 
           titleController.text = '';
-          optionsController.text = '';
           await statusList();
         }
       },
       btnCancelOnPress: () {
         Get.back();
         titleController.text = '';
-        optionsController.text = '';
       },
       body: Form(
         key: statusFormKey,
@@ -130,19 +124,6 @@ class StatusController extends GetxController {
             ),
             const SizedBox(
               height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 5, right: 5),
-              child: TextFormField(
-                controller: optionsController,
-                style: TextStyle(color: AppColors().kTextColor),
-                cursorColor: AppColors().kCursorColor,
-                decoration: InputDecorationWidget().inputDecoration(
-                    '${statusListTask[index].settings}', FontAwesomeIcons.cogs),
-              ),
-            ),
-            const SizedBox(
-              height: 15,
             ),
             Obx(() => SizedBox(
                 width: Get.width / 1.7,
@@ -185,22 +166,17 @@ class StatusController extends GetxController {
       btnOkOnPress: () async {
         if (titleController.text == null || titleController.text.isEmpty) {
           StatusGroupMessages.statusGroupCreateTitleFail();
-        } else if (optionsController.text == null ||
-            optionsController.text.isEmpty) {
-          StatusGroupMessages.statusGroupCreateSettingsFail();
         } else {
           Get.off(StatusView());
-          await statusCreate(titleController.text, optionsController.text,
+          await statusCreate(titleController.text, 'a',
               int.parse(_settingsController.selectedGroupID.value));
           titleController.text = '';
-          optionsController.text = '';
           await statusList();
         }
       },
       btnCancelOnPress: () {
         Get.back();
         titleController.text = '';
-        optionsController.text = '';
       },
       body: Form(
         key: statusFormKey,
@@ -221,19 +197,6 @@ class StatusController extends GetxController {
             ),
             const SizedBox(
               height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 5, right: 5),
-              child: TextFormField(
-                controller: optionsController,
-                style: TextStyle(color: AppColors().kTextColor),
-                cursorColor: AppColors().kCursorColor,
-                decoration: InputDecorationWidget()
-                    .inputDecoration('Ayarlar', FontAwesomeIcons.cogs),
-              ),
-            ),
-            const SizedBox(
-              height: 15,
             ),
             Obx(
               () => SizedBox(

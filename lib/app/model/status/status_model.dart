@@ -1,7 +1,7 @@
 /// code : 200
-/// message : "Statü listeleme işleminiz başarılı bir şekilde gerçekleştirilmiştir."
-/// result : {"token":"3764373463393362ecfe9c6b0977a649","conclusion":[{"id":1,"title":"Statu1","group_id":1,"settings":"settings","created_at":"2021-12-21T13:46:19.000000Z","updated_at":"2021-12-21T13:46:19.000000Z"},{"id":2,"title":"ron.digital","group_id":1,"settings":"settings","created_at":"2021-12-21T14:11:56.000000Z","updated_at":"2021-12-21T14:11:56.000000Z"},{"id":3,"title":"ron.digital","group_id":1,"settings":"settings","created_at":"2021-12-21T14:14:51.000000Z","updated_at":"2021-12-21T14:14:51.000000Z"},{"id":4,"title":"ron.digital","group_id":2,"settings":"settings","created_at":"2021-12-21T14:17:26.000000Z","updated_at":"2021-12-21T14:17:26.000000Z"},{"id":5,"title":"berat","group_id":1,"settings":"settings","created_at":"2021-12-21T14:18:49.000000Z","updated_at":"2021-12-21T14:18:49.000000Z"},{"id":6,"title":"berat","group_id":1,"settings":"settings","created_at":"2021-12-21T14:20:37.000000Z","updated_at":"2021-12-21T14:20:37.000000Z"},{"id":7,"title":"Mehmet Deneme","group_id":1,"settings":"settings","created_at":"2021-12-21T14:21:59.000000Z","updated_at":"2021-12-21T14:21:59.000000Z"},{"id":8,"title":"Mehmet Deneme","group_id":1,"settings":"[]","created_at":"2021-12-21T14:22:53.000000Z","updated_at":"2021-12-21T14:22:53.000000Z"}]}
-/// options : {"columns":[],"doc_url":"https://console.ron.digital/panel/doc/v1/route?name=status.read"}
+/// message : "Statüler modülünde status.read yolunda 200 hata dönüşü gerçekleşti."
+/// result : {"token":"dbdddec07a3edd205e901a833df06db9defb5d2ce02366085c6c1a654588d92b","conclusion":[{"id":1,"title":"jahah","group":"statü grup mobil"},{"id":2,"title":"statü 34","group":"sehr"},{"id":3,"title":"statu","group":"statü grup mobil"},{"id":4,"title":"baslik.  statuuus","group":"statu grubu"},{"id":5,"title":"as","group":"statu grubu"}]}
+/// options : {"columns":[{"title":"Başlık","name":"title"},{"title":"Grup","name":"group"},{"title":"İşlemler","name":"id"}],"doc_url":"https://console.ron.digital/panel/doc/v1/route?name=status.read"}
 
 class StatusModel {
   StatusModel({
@@ -46,12 +46,12 @@ class StatusModel {
 
 }
 
-/// columns : []
+/// columns : [{"title":"Başlık","name":"title"},{"title":"Grup","name":"group"},{"title":"İşlemler","name":"id"}]
 /// doc_url : "https://console.ron.digital/panel/doc/v1/route?name=status.read"
 
 class Options {
   Options({
-      List<dynamic>? columns, 
+      List<Columns>? columns, 
       String? docUrl,}){
     _columns = columns;
     _docUrl = docUrl;
@@ -61,15 +61,15 @@ class Options {
     if (json['columns'] != null) {
       _columns = [];
       json['columns'].forEach((v) {
-        _columns?.add(Options.fromJson(v));
+        _columns?.add(Columns.fromJson(v));
       });
     }
     _docUrl = json['doc_url'];
   }
-  List<dynamic>? _columns;
+  List<Columns>? _columns;
   String? _docUrl;
 
-  List<dynamic>? get columns => _columns;
+  List<Columns>? get columns => _columns;
   String? get docUrl => _docUrl;
 
   Map<String, dynamic> toJson() {
@@ -83,8 +83,38 @@ class Options {
 
 }
 
-/// token : "3764373463393362ecfe9c6b0977a649"
-/// conclusion : [{"id":1,"title":"Statu1","group_id":1,"settings":"settings","created_at":"2021-12-21T13:46:19.000000Z","updated_at":"2021-12-21T13:46:19.000000Z"},{"id":2,"title":"ron.digital","group_id":1,"settings":"settings","created_at":"2021-12-21T14:11:56.000000Z","updated_at":"2021-12-21T14:11:56.000000Z"},{"id":3,"title":"ron.digital","group_id":1,"settings":"settings","created_at":"2021-12-21T14:14:51.000000Z","updated_at":"2021-12-21T14:14:51.000000Z"},{"id":4,"title":"ron.digital","group_id":2,"settings":"settings","created_at":"2021-12-21T14:17:26.000000Z","updated_at":"2021-12-21T14:17:26.000000Z"},{"id":5,"title":"berat","group_id":1,"settings":"settings","created_at":"2021-12-21T14:18:49.000000Z","updated_at":"2021-12-21T14:18:49.000000Z"},{"id":6,"title":"berat","group_id":1,"settings":"settings","created_at":"2021-12-21T14:20:37.000000Z","updated_at":"2021-12-21T14:20:37.000000Z"},{"id":7,"title":"Mehmet Deneme","group_id":1,"settings":"settings","created_at":"2021-12-21T14:21:59.000000Z","updated_at":"2021-12-21T14:21:59.000000Z"},{"id":8,"title":"Mehmet Deneme","group_id":1,"settings":"[]","created_at":"2021-12-21T14:22:53.000000Z","updated_at":"2021-12-21T14:22:53.000000Z"}]
+/// title : "Başlık"
+/// name : "title"
+
+class Columns {
+  Columns({
+      String? title, 
+      String? name,}){
+    _title = title;
+    _name = name;
+}
+
+  Columns.fromJson(dynamic json) {
+    _title = json['title'];
+    _name = json['name'];
+  }
+  String? _title;
+  String? _name;
+
+  String? get title => _title;
+  String? get name => _name;
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['title'] = _title;
+    map['name'] = _name;
+    return map;
+  }
+
+}
+
+/// token : "dbdddec07a3edd205e901a833df06db9defb5d2ce02366085c6c1a654588d92b"
+/// conclusion : [{"id":1,"title":"jahah","group":"statü grup mobil"},{"id":2,"title":"statü 34","group":"sehr"},{"id":3,"title":"statu","group":"statü grup mobil"},{"id":4,"title":"baslik.  statuuus","group":"statu grubu"},{"id":5,"title":"as","group":"statu grubu"}]
 
 class Result {
   Result({
@@ -121,58 +151,37 @@ class Result {
 }
 
 /// id : 1
-/// title : "Statu1"
-/// group_id : 1
-/// settings : "settings"
-/// created_at : "2021-12-21T13:46:19.000000Z"
-/// updated_at : "2021-12-21T13:46:19.000000Z"
+/// title : "jahah"
+/// group : "statü grup mobil"
 
 class ConclusionStatus {
   ConclusionStatus({
       int? id, 
       String? title, 
-      int? groupId, 
-      String? settings, 
-      String? createdAt, 
-      String? updatedAt,}){
+      String? group,}){
     _id = id;
     _title = title;
-    _groupId = groupId;
-    _settings = settings;
-    _createdAt = createdAt;
-    _updatedAt = updatedAt;
+    _group = group;
 }
 
   ConclusionStatus.fromJson(dynamic json) {
     _id = json['id'];
     _title = json['title'];
-    _groupId = json['group_id'];
-    _settings = json['settings'];
-    _createdAt = json['created_at'];
-    _updatedAt = json['updated_at'];
+    _group = json['group'];
   }
   int? _id;
   String? _title;
-  int? _groupId;
-  String? _settings;
-  String? _createdAt;
-  String? _updatedAt;
+  String? _group;
 
   int? get id => _id;
   String? get title => _title;
-  int? get groupId => _groupId;
-  String? get settings => _settings;
-  String? get createdAt => _createdAt;
-  String? get updatedAt => _updatedAt;
+  String? get group => _group;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = _id;
     map['title'] = _title;
-    map['group_id'] = _groupId;
-    map['settings'] = _settings;
-    map['created_at'] = _createdAt;
-    map['updated_at'] = _updatedAt;
+    map['group'] = _group;
     return map;
   }
 

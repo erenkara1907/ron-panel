@@ -102,6 +102,7 @@ class UserController extends GetxController {
         } else if (passwordController.text.length < 6) {
           UserMessages.userCreatePasswordFail();
         } else {
+          Get.back();
           await userUpdate(
             nameController.text,
             emailController.text,
@@ -116,10 +117,10 @@ class UserController extends GetxController {
         }
       },
       btnCancelOnPress: () {
+        Get.back();
         emailController.text = "";
         passwordController.text = "";
         nameController.text = "";
-        Get.off(UserView());
       },
       body: Form(
         key: userFormKey,
@@ -206,6 +207,7 @@ class UserController extends GetxController {
         } else if (passwordController.text.length < 6) {
           UserMessages.userCreatePasswordFail();
         } else {
+          Get.off(UserView());
           UserMessages.userCreateSuccess();
           await userCreate(emailController.text, passwordController.text,
               nameController.text);
@@ -213,14 +215,13 @@ class UserController extends GetxController {
           emailController.text = '';
           passwordController.text = '';
           await userList();
-          Get.off(UserView());
         }
       },
       btnCancelOnPress: () {
+        Get.back();
         nameController.text = '';
         emailController.text = '';
         passwordController.text = '';
-        Get.back();
       },
       body: Form(
         key: userFormKey,
