@@ -98,7 +98,7 @@ class BorrowController extends GetxController {
         } else if (formattedDate! == '' || formattedDate!.isEmpty) {
           BorrowMessages.borrowCreateDateFail();
           _settingsController.borrowDescriptionController.text = '';
-        } else if (borrowFormKey.currentState?.validate() ?? false) {
+        } else if (borrowFormKey.currentState?.validate() == false) {
           BorrowMessages.borrowCreateFail();
         } else {
           Get.back();
