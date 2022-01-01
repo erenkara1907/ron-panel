@@ -33,6 +33,7 @@ class DepartmentController extends GetxController {
   var departmentListTask = <ConclusionDepartment>[].obs;
 
   GlobalKey<FormState> departmentFormKey = GlobalKey();
+  GlobalKey<FormState> departmentUpdateFormKey = GlobalKey();
 
   @override
   void onInit() async {
@@ -107,7 +108,12 @@ class DepartmentController extends GetxController {
       btnOkOnPress: () async {
         if (titleController.text == null || titleController.text.isEmpty) {
           DepartmentMessages.departmentCreateTitleFail();
-        } else {
+        }
+        else if(departmentUpdateFormKey.currentState!.validate() == false){
+          DepartmentMessages.departmentUpdateDropFail();
+        }
+
+        else {
           Get.back();
           await departmentUpdate(
               titleController.text,
@@ -125,6 +131,7 @@ class DepartmentController extends GetxController {
         titleController.text = '';
       },
       body: Form(
+        key: departmentUpdateFormKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -144,10 +151,12 @@ class DepartmentController extends GetxController {
             const SizedBox(
               height: 15,
             ),
-            Obx(() => SizedBox(
-                  width: Get.width / 1.7,
-                  height: Get.height / 14,
-                  child: DropdownButtonFormField<String>(
+            Obx(() =>  DropdownButtonFormField<String>(
+                    validator: (value){
+                      return (value == null || value.isEmpty)
+                          ? 'Lütfen Kullanıcı Seçiniz'
+                          : null;
+                    },
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15.0))),
@@ -160,7 +169,7 @@ class DepartmentController extends GetxController {
                           value: map.id.toString(), child: Text("${map.name}"));
                     }).toList(),
                   ),
-                )),
+                ),
             const SizedBox(height: 15,),
             Obx(
               () => SizedBox(
@@ -186,10 +195,12 @@ class DepartmentController extends GetxController {
             ),
             Obx(
               () => _settingsController.selectedParentType.value == 'child'
-                  ? SizedBox(
-                      width: Get.width / 1.7,
-                      height: Get.height / 14,
-                      child: DropdownButtonFormField<String>(
+                  ?  DropdownButtonFormField<String>(
+                        validator: (value){
+                          return (value == null || value.isEmpty)
+                              ? 'Lütfen Kullanıcı Seçiniz'
+                              : null;
+                        },
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15.0))),
@@ -203,8 +214,8 @@ class DepartmentController extends GetxController {
                               value: map.id.toString(),
                               child: Text("${map.title}"));
                         }).toList(),
-                      ),
-                    )
+                      )
+
                   : Text(''),
             ),
           ],
@@ -221,7 +232,12 @@ class DepartmentController extends GetxController {
         if (titleController.text == null ||
             titleController.text.isEmpty) {
           DepartmentMessages.departmentCreateTitleUpdateFail();
-        } else {
+        }
+        else if(departmentFormKey.currentState!.validate() == false){
+          DepartmentMessages.departmentCreateDropFail();
+        }
+
+        else {
           Get.back();
           Get.off(DepartmentView());
           await departmentCreate(
@@ -282,10 +298,13 @@ class DepartmentController extends GetxController {
               height: 10,
             ),
             Obx(
-                  () => SizedBox(
-                width: Get.width / 1.7,
-                height: Get.height / 14,
-                child: DropdownButtonFormField<String>(
+                  () =>
+                DropdownButtonFormField<String>(
+                  validator: (value){
+                    return (value == null || value.isEmpty)
+                        ? 'Lütfen Kullanıcı Seçiniz'
+                        : null;
+                  },
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.0))),
@@ -300,17 +319,20 @@ class DepartmentController extends GetxController {
                     );
                   }).toList(),
                 ),
-              ),
+
             ),
             const SizedBox(
               height: 10,
             ),
             Obx(
                   () => _settingsController.selectedParentType.value == 'child'
-                  ? SizedBox(
-                width: Get.width / 1.7,
-                height: Get.height / 14,
-                child: DropdownButtonFormField<String>(
+                  ?
+                DropdownButtonFormField<String>(
+                  validator: (value){
+                    return (value == null || value.isEmpty)
+                        ? 'Lütfen Departman Seçiniz'
+                        : null;
+                  },
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.0))),
@@ -325,8 +347,8 @@ class DepartmentController extends GetxController {
                         value: map.id.toString(),
                         child: Text("${map.title}"));
                   }).toList(),
-                ),
-              )
+                )
+
                   : const Text(''),
             ),
           ],

@@ -148,7 +148,11 @@ class ProductController extends GetxController {
             null ||
             _settingsController.productSerialNumberController.text.isEmpty) {
           ProductMessages.productCreateSerialNumberFail();
-        } else {
+        } else if(productFormKey.currentState?.validate() == false){
+          ProductMessages.productCreateDropCategoryFail();
+        }
+
+        else {
           Get.back();
           Get.off(ProductView());
           _settingsController.productPrice.value ==
@@ -225,26 +229,27 @@ class ProductController extends GetxController {
                     future: _settingsController.getCategoryID(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return SizedBox(
-                          width: Get.width / 1.7,
-                          height: Get.height / 14,
-                          child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15.0))),
-                            hint: Text("Kategori seçiniz"),
-                            onChanged: (String? newValue) {
-                              _settingsController
-                                  .setSelectedCategoryId(newValue!);
-                            },
-                            items:
-                            _categoryController.categoryListTask.map((map) {
-                              return DropdownMenuItem(
-                                value: map.id.toString(),
-                                child: Text("${map.title}"),
-                              );
-                            }).toList(),
-                          ),
+                        return DropdownButtonFormField<String>(
+                          validator: (value){
+                            return (value == null || value.isEmpty)
+                                ? 'Lütfen Kategori Seçiniz'
+                                : null;
+                          },
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15.0))),
+                          hint: Text("Kategori seçiniz"),
+                          onChanged: (String? newValue) {
+                            _settingsController
+                                .setSelectedCategoryId(newValue!);
+                          },
+                          items:
+                          _categoryController.categoryListTask.map((map) {
+                            return DropdownMenuItem(
+                              value: map.id.toString(),
+                              child: Text("${map.title}"),
+                            );
+                          }).toList(),
                         );
                       } else {
                         return Text("Listeye boş olduğu için ulaşılamıyor");

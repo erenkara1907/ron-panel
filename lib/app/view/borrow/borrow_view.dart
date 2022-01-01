@@ -35,7 +35,7 @@ class BorrowView extends GetView<BorrowController> {
                         itemBuilder: (BuildContext context, int index) {
                           return CardWidget(
                             title:
-                                '${controller.borrowListTask[index].actionCode}',
+                                '${controller.borrowListTask[index].description}',
                             borderColor: Colors.white,
                             shadowColor: Colors.white,
                             children: [

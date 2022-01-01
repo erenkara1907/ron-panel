@@ -45,10 +45,28 @@ class DepartmentMessages {
       snackPosition: SnackPosition.BOTTOM,
     );
   }
+  static departmentUpdateDropFail(){
+    Get.snackbar(
+      'Başarısız',
+      'Lütfen Gerekli Alanları Doldurunuz',
+      colorText: Colors.white,
+      backgroundColor: Colors.red,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
   static departmentCreateTitleUpdateFail(){
     Get.snackbar(
       'Başarısız',
       'Lütfen Başlık Giriniz',
+      colorText: Colors.white,
+      backgroundColor: Colors.red,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+  static departmentCreateDropFail(){
+    Get.snackbar(
+      'Başarısız',
+      'Lütfen Gerekli Alanları Doldurunuz',
       colorText: Colors.white,
       backgroundColor: Colors.red,
       snackPosition: SnackPosition.BOTTOM,

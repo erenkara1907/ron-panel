@@ -44,6 +44,15 @@ class StatusGroupMessages {
       snackPosition: SnackPosition.BOTTOM,
     );
   }
+  static statusGroupCreateDropFail(){
+    Get.snackbar(
+      'Başarısız',
+      'Lütfen Statu Grubu Seçiniz',
+      colorText: Colors.white,
+      backgroundColor: Colors.red,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
 
   static statusGroupCreateSettingsFail(){
     Get.snackbar(

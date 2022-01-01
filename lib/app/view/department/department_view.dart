@@ -41,7 +41,7 @@ class DepartmentView extends GetView<DepartmentController> {
                   children: [
                     Expanded(
                       child: Text(
-                        controller.departmentListTask[index].title!,
+                        controller.departmentListTask[index].parentType!,
                         style: AppTextStyle().kTextStyleEmail,
                       ),
                     ),

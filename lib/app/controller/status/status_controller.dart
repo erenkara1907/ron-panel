@@ -32,6 +32,7 @@ class StatusController extends GetxController {
 
   var statusListTask = <ConclusionStatus>[].obs;
   GlobalKey<FormState> statusFormKey = GlobalKey();
+  GlobalKey<FormState> statusUpdateFormKey = GlobalKey();
 
   @override
   void onInit() {
@@ -87,7 +88,11 @@ class StatusController extends GetxController {
       btnOkOnPress: () async {
         if (titleController.text.isEmpty || titleController.text == null) {
           StatusMessages.statusUpdateTitleFail();
-        } else {
+        }
+        else if(statusUpdateFormKey.currentState!.validate() == false){
+          StatusGroupMessages.statusGroupCreateDropFail();
+        }
+        else {
           Get.back();
           await statusUpdate(
             titleController.text,
@@ -105,7 +110,7 @@ class StatusController extends GetxController {
         titleController.text = '';
       },
       body: Form(
-        key: statusFormKey,
+        key: statusUpdateFormKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -125,14 +130,16 @@ class StatusController extends GetxController {
             const SizedBox(
               height: 10,
             ),
-            Obx(() => SizedBox(
-                width: Get.width / 1.7,
-                height: Get.height / 14,
-                child: FutureBuilder(
+            Obx(() =>  FutureBuilder(
                   future: _settingsController.getGroupID(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return DropdownButtonFormField<String>(
+                        validator: (value){
+                          return (value == null || value.isEmpty)
+                              ? 'Lütfen Statü Grubu Seçiniz'
+                              : null;
+                        },
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15.0))),
@@ -152,7 +159,9 @@ class StatusController extends GetxController {
                       return const Text("Liste bulunamadı");
                     }
                   },
-                )))
+                )
+
+            )
           ],
         ),
       ),
@@ -166,7 +175,11 @@ class StatusController extends GetxController {
       btnOkOnPress: () async {
         if (titleController.text == null || titleController.text.isEmpty) {
           StatusGroupMessages.statusGroupCreateTitleFail();
-        } else {
+        }
+        else if(statusFormKey.currentState!.validate() == false){
+             StatusGroupMessages.statusGroupCreateDropFail();
+        }
+        else {
           Get.back();
           Get.off(StatusView());
           await statusCreate(titleController.text, 'a',
@@ -200,14 +213,17 @@ class StatusController extends GetxController {
               height: 10,
             ),
             Obx(
-              () => SizedBox(
-                width: Get.width / 1.7,
-                height: Get.height / 14,
-                child: FutureBuilder(
+              () =>
+                 FutureBuilder(
                   future: _settingsController.getGroupID(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return DropdownButtonFormField<String>(
+                        validator: (value){
+                          return (value == null || value.isEmpty)
+                              ? 'Lütfen Statü Grubu Seçiniz'
+                              : null;
+                        },
                         decoration: InputDecoration(
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15.0))),
@@ -228,7 +244,7 @@ class StatusController extends GetxController {
                     }
                   },
                 ),
-              ),
+
             ),
           ],
         ),

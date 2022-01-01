@@ -108,4 +108,14 @@ class ProductMessages {
       snackPosition: SnackPosition.BOTTOM,
     );
   }
+
+  static productCreateDropCategoryFail() {
+    Get.snackbar(
+      'Başarısız',
+      'Lütfen Kategori Belirleyiniz',
+      colorText: Colors.white,
+      backgroundColor: Colors.red,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
 }

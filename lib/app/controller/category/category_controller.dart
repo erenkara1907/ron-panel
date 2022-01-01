@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:ronventory_mobile/app/controller/settings/settings_controller.dart';
 import 'package:ronventory_mobile/app/core/auth_manager.dart';
 import 'package:ronventory_mobile/app/core/common_widgets/awesome_dialog.widget.dart';
@@ -36,6 +37,7 @@ class CategoryController extends GetxController {
   var categoryName = ''.obs;
 
   GlobalKey<FormState> categoryCreateFormKey = GlobalKey();
+  GlobalKey<FormState> categoryUpdateFormKey = GlobalKey();
 
   @override
   void onInit() async {
@@ -97,7 +99,12 @@ class CategoryController extends GetxController {
       btnOkOnPress: () async {
         if (titleController.text.isEmpty || titleController.text == null) {
           CategoryMessages.categoryUpdateTittleFail();
-        } else {
+        }
+        else if(categoryUpdateFormKey.currentState!.validate() == false){
+          CategoryMessages.categoryDropFail();
+
+        }
+        else {
           Get.back();
           await categoryUpdate(
               titleController.text,
@@ -115,6 +122,7 @@ class CategoryController extends GetxController {
       },
       body: Form(
         autovalidateMode: AutovalidateMode.onUserInteraction,
+        key : categoryUpdateFormKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -161,14 +169,18 @@ class CategoryController extends GetxController {
                     future: _settingsController.getCategoryID(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return SizedBox(
-                          width: Get.width / 1.7,
-                          height: Get.height / 14,
-                          child: DropdownButtonFormField<String>(
+                        return
+                           DropdownButtonFormField<String>(
+
+                            validator: (value){
+                              return (value == null || value.isEmpty)
+                                  ? 'Lütfen Kategori Seçiniz'
+                                  : null;
+                            },
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15.0))),
-                            value: _settingsController.selectedCategoryId.value,
+                            hint: Text('Lütfen Kategori Belirleyin'),
                             onChanged: (String? newId) {
                               _settingsController.selectedCategoryId.value =
                                   newId!;
@@ -178,8 +190,8 @@ class CategoryController extends GetxController {
                                   value: map.id.toString(),
                                   child: Text("${map.title}"));
                             }).toList(),
-                          ),
-                        );
+                          );
+
                       } else {
                         return const Text("Liste Bulunamıyor");
                       }
@@ -201,7 +213,12 @@ class CategoryController extends GetxController {
       btnOkOnPress: () async {
         if (titleController.text.isEmpty || titleController.text == null) {
           CategoryMessages.categoryCreateTitleFail();
-        } else {
+        }else if(categoryCreateFormKey.currentState!.validate() == false){
+          CategoryMessages.categoryDropFail();
+        }
+
+
+        else {
           Get.back();
           Get.off(CategoryView());
           await categoryCreate(
@@ -242,7 +259,8 @@ class CategoryController extends GetxController {
               () => SizedBox(
                 width: Get.width / 1.7,
                 height: Get.height / 14,
-                child: DropdownButtonFormField(
+                child: DropdownButtonFormField<String>(
+
                   decoration: InputDecoration(
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15.0))),
@@ -266,10 +284,12 @@ class CategoryController extends GetxController {
                     future: _settingsController.getCategoryID(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return SizedBox(
-                          width: Get.width / 1.7,
-                          height: Get.height / 14,
-                          child: DropdownButtonFormField<String>(
+                        return  DropdownButtonFormField<String>(
+                            validator: (value){
+                              return (value == null || value.isEmpty)
+                                  ? 'Lütfen Kategori Seçiniz'
+                                  : null;
+                            },
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15.0))),
@@ -280,11 +300,12 @@ class CategoryController extends GetxController {
                             },
                             items: categoryListTask.map((map) {
                               return DropdownMenuItem<String>(
+
                                   value: map.id.toString(),
                                   child: Text("${map.title}"));
                             }).toList(),
-                          ),
-                        );
+                          );
+
                       } else {
                         return const Text("Liste Bulunamıyor");
                       }
