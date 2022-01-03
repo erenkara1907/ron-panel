@@ -40,7 +40,7 @@ class SplashView extends GetView<SplashController> {
       duration: 4000,
       imageSize: 130,
       imageSrc: "assets/splash.jpeg",
-      text: "RONVENTORY",
+      text: "PANEL",
       textType: TextType.ColorizeAnimationText,
       textStyle: GoogleFonts.montserrat(
           fontWeight: FontWeight.w500,
