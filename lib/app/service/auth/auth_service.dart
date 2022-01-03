@@ -9,9 +9,8 @@ import 'package:ronventory_mobile/app/util/consts.dart';
 class AuthService extends GetConnect with AuthBase {
   @override
   Future<LoginResponseModel?> login(LoginRequestModel model) async {
-    final response = await post(loginUrl, model.toJson() , headers: {
-      "x-device" : "mobile"
-    });
+    final response =
+        await post(loginUrl, model.toJson(), headers: {"x-device": "mobile"});
     return LoginResponseModel.fromJson(response.body);
   }
 

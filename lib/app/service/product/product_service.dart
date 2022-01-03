@@ -41,7 +41,6 @@ class ProductService extends GetConnect with ProductBase {
       'x-token': token,
       'x-device': 'mobile'
     });
-
     return ProductModel.fromJson(response.body);
   }
 

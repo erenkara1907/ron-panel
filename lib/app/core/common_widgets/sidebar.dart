@@ -11,6 +11,7 @@ import 'package:ronventory_mobile/app/controller/status/status_controller.dart';
 import 'package:ronventory_mobile/app/controller/status_group/status_group_controller.dart';
 import 'package:ronventory_mobile/app/controller/user/user_controller.dart';
 import 'package:ronventory_mobile/app/core/auth_manager.dart';
+import 'package:ronventory_mobile/app/core/common_widgets/awesome_dialog.widget.dart';
 import 'package:ronventory_mobile/app/general/text/app_text.style.dart';
 import 'package:ronventory_mobile/app/view/borrow/borrow_view.dart';
 import 'package:ronventory_mobile/app/view/category/category_view.dart';
@@ -99,140 +100,152 @@ class _SideBarState extends State<SideBar> {
         ),
         Expanded(
           child: Obx(
-            () => ListView.builder(
-              itemCount: _settingsController.settingsList.length,
-              itemBuilder: (BuildContext context, int index) {
-                if (_settingsController.settingsList[index].child == null) {
-                  return ListTile(
-                    title: Text(
-                        "${_settingsController.settingsList[index].title}"),
-                  );
-                } else {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        Get.off(HomeView());
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 38),
-                      child: DropdownButton(
-                          borderRadius: BorderRadius.circular(10.0),
-                          underline: Container(),
-                          dropdownColor: Colors.white,
-                          hint: Container(
-                              padding: const EdgeInsets.only(left: 16),
-                              child: Text(
-                                  '${_settingsController.settingsList[index].title}')),
-                          icon: _settingsController
-                                  .settingsList[index].child!.isNotEmpty
-                              ? const FaIcon(
-                                  FontAwesomeIcons.angleDown,
-                                  color: Colors.grey,
-                                )
-                              : null,
-                          iconSize: 24,
-                          elevation: 0,
-                          onChanged: (String? newValue) {
+            () => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 30.0),
+                  child: ElevatedButton(onPressed: (){Get.off(HomeView()); }, child: const Text('Ödünç Aldıklarım'),style: sendButton2,),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _settingsController.settingsList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (_settingsController.settingsList[index].child == null) {
+                        return ListTile(
+                          title: Text(
+                              "${_settingsController.settingsList[index].title}"),
+                        );
+                      } else {
+                        return GestureDetector(
+                          onTap: () {
                             setState(() {
-                              _settingsController.settingsList[index]
-                                  .child![index].title = newValue!;
+                              Get.off(HomeView());
                             });
                           },
-                          items: _settingsController.settingsList[index].child!
-                              .map<DropdownMenuItem<String>>((value) {
-                            return DropdownMenuItem<String>(
-                              value: value.title,
-                              child: GestureDetector(
-                                onTap: () async {
-                                  switch (value.route) {
-                                    case "department.read":
-                                      Get.off(DepartmentView());
-                                      break;
-                                    case "category.read":
-                                      Get.off(CategoryView());
-                                      break;
-                                    case "borrow.read":
-                                      Get.off(BorrowView());
-
-                                      break;
-                                    case "product.read":
-                                      Get.off(ProductView());
-                                      break;
-                                    case "product.create":
-                                      _productController
-                                          .productCreateMethod(context)
-                                          .show();
-                                      break;
-                                    case "department.create":
-                                      _departmentController
-                                          .departmentCreateMethod(context)
-                                          .show();
-                                      break;
-                                    case "category.create":
-                                      _categoryController
-                                          .categoryCreateMethod(context)
-                                          .show();
-                                      break;
-
-                                    case "permission.read":
-                                      Get.off(PermissionView());
-                                      break;
-
-                                    case "user.read":
-                                      Get.off(UserView());
-                                      break;
-
-                                    case "user.create":
-                                      _userController
-                                          .userCreateMethod(context)
-                                          .show();
-                                      break;
-
-                                    case "borrow.create":
-                                      _borrowController
-                                          .borrowCreateMethod(context)
-                                          .show();
-                                      break;
-
-                                    case "statusGroup.read":
-                                      Get.off(StatusGroupView());
-                                      break;
-
-                                    case "statusGroup.create":
-                                      _statusGroupController
-                                          .statusGroupCreateMethod(context)
-                                          .show();
-                                      break;
-
-                                    case "status.read":
-                                      Get.off(StatusView());
-                                      break;
-
-                                    case "status.create":
-                                      _statusController
-                                          .statusCreateMethod(context)
-                                          .show();
-                                      break;
-                                  }
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 38),
+                            child: DropdownButton(
+                                borderRadius: BorderRadius.circular(10.0),
+                                underline: Container(),
+                                dropdownColor: Colors.white,
+                                hint: Container(
+                                    padding: const EdgeInsets.only(left: 16),
+                                    child: Text(
+                                        '${_settingsController.settingsList[index].title}')),
+                                icon: _settingsController
+                                        .settingsList[index].child!.isNotEmpty
+                                    ? const FaIcon(
+                                        FontAwesomeIcons.angleDown,
+                                        color: Colors.grey,
+                                      )
+                                    : null,
+                                iconSize: 24,
+                                elevation: 0,
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _settingsController.settingsList[index]
+                                        .child![index].title = newValue!;
+                                  });
                                 },
-                                child: SizedBox(
-                                  width: Get.width / 1.6,
-                                  child: Text(
-                                    value.title!,
-                                    style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList()),
-                    ),
-                  );
-                }
-              },
+                                items: _settingsController.settingsList[index].child!
+                                    .map<DropdownMenuItem<String>>((value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value.title,
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        switch (value.route) {
+                                          case "department.read":
+                                            Get.off(DepartmentView());
+                                            break;
+                                          case "category.read":
+                                            Get.off(CategoryView());
+                                            break;
+                                          case "borrow.read":
+                                            Get.off(BorrowView());
+
+                                            break;
+                                          case "product.read":
+                                            Get.off(ProductView());
+                                            break;
+                                          case "product.create":
+                                            _productController
+                                                .productCreateMethod(context)
+                                                .show();
+                                            break;
+                                          case "department.create":
+                                            _departmentController
+                                                .departmentCreateMethod(context)
+                                                .show();
+                                            break;
+                                          case "category.create":
+                                            _categoryController
+                                                .categoryCreateMethod(context)
+                                                .show();
+                                            break;
+
+                                          case "permission.read":
+                                            Get.off(PermissionView());
+                                            break;
+
+                                          case "user.read":
+                                            Get.off(UserView());
+                                            break;
+
+                                          case "user.create":
+                                            _userController
+                                                .userCreateMethod(context)
+                                                .show();
+                                            break;
+
+                                          case "borrow.create":
+                                            _borrowController
+                                                .borrowCreateMethod(context)
+                                                .show();
+                                            break;
+
+                                          case "statusGroup.read":
+                                            Get.off(StatusGroupView());
+                                            break;
+
+                                          case "statusGroup.create":
+                                            _statusGroupController
+                                                .statusGroupCreateMethod(context)
+                                                .show();
+                                            break;
+
+                                          case "status.read":
+                                            Get.off(StatusView());
+                                            break;
+
+                                          case "status.create":
+                                            _statusController
+                                                .statusCreateMethod(context)
+                                                .show();
+                                            break;
+                                        }
+                                      },
+                                      child: SizedBox(
+                                        width: Get.width / 1.6,
+                                        child: Text(
+                                          value.title!,
+                                          style: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList()),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ),

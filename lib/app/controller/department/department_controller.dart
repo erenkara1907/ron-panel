@@ -269,7 +269,7 @@ class DepartmentController extends GetxController {
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
                 decoration: InputDecorationWidget()
-                    .inputDecoration('Başlık?', FontAwesomeIcons.question),
+                    .inputDecoration('Departman Adı', FontAwesomeIcons.building),
               ),
             ),
             const SizedBox(

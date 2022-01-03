@@ -17,10 +17,8 @@ class BorrowService extends GetConnect with BorrowBase {
 
   @override
   Future<BorrowModel?> borrowList(String token) async {
-    final response = await get(borrowListUrl, headers: {
-      'x-token': token,
-      'x-device': 'mobile'
-    });
+    final response = await get(borrowListUrl,
+        headers: {'x-token': token, 'x-device': 'mobile'});
 
     return BorrowModel.fromJson(response.body);
   }

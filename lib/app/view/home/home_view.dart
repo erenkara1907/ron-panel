@@ -13,7 +13,6 @@ import 'package:ronventory_mobile/app/controller/user/user_controller.dart';
 import 'package:ronventory_mobile/app/core/auth_manager.dart';
 import 'package:ronventory_mobile/app/core/common_widgets/card_widget.dart';
 import 'package:ronventory_mobile/app/core/common_widgets/sidebar.dart';
-import 'package:ronventory_mobile/app/core/common_widgets/try_again.widget.dart';
 import 'package:ronventory_mobile/app/general/color/app_colors.dart';
 import 'package:ronventory_mobile/app/general/text/app_text.style.dart';
 import 'package:skeletons/skeletons.dart';
@@ -46,15 +45,15 @@ class _HomeViewState extends State<HomeView> {
 
   Future<void> getData() async {
     await _authManager.bringToken();
-    await _categoryController.categoryList();
-    await _departmentController.departmentList();
-    await _userController.userList();
     await _settingsController.getSettings();
-    await _productController.productList();
-    await _statusGroupController.statusGroupList();
-    await _permissionController.permissionList();
     await controller.borrowList();
-    await _statusController.statusList();
+      await _productController.productList();
+      await _userController.userList();
+      await _categoryController.categoryList();
+      await _departmentController.departmentList();
+      await _statusGroupController.statusGroupList();
+      await _statusController.statusList();
+      await _permissionController.permissionList();
   }
 
   @override

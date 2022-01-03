@@ -136,7 +136,7 @@ class UserController extends GetxController {
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
                 decoration: InputDecorationWidget()
-                    .inputDecoration('Kullanıcı Adı?', FontAwesomeIcons.user),
+                    .inputDecoration('Kullanıcı Adı', FontAwesomeIcons.user),
               ),
             ),
             const SizedBox(
@@ -149,7 +149,7 @@ class UserController extends GetxController {
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
                 decoration: InputDecorationWidget()
-                    .inputDecoration('Email?', FontAwesomeIcons.mailBulk),
+                    .inputDecoration('Email', FontAwesomeIcons.mailBulk),
               ),
             ),
             const SizedBox(
@@ -164,7 +164,7 @@ class UserController extends GetxController {
                     style: TextStyle(color: AppColors().kTextColor),
                     cursorColor: AppColors().kCursorColor,
                     decoration: InputDecorationWidget().inputDecoration(
-                      'Parola?',
+                      'Parola',
                       FontAwesomeIcons.lock,
                       suffixIcon: IconButton(
                         onPressed: () {
@@ -238,7 +238,7 @@ class UserController extends GetxController {
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
                 decoration: InputDecorationWidget()
-                    .inputDecoration('Kullanıcı Adı?', FontAwesomeIcons.user),
+                    .inputDecoration('Kullanıcı Adı', FontAwesomeIcons.user),
               ),
             ),
             const SizedBox(
@@ -251,7 +251,7 @@ class UserController extends GetxController {
                 style: TextStyle(color: AppColors().kTextColor),
                 cursorColor: AppColors().kCursorColor,
                 decoration: InputDecorationWidget()
-                    .inputDecoration('Email?', FontAwesomeIcons.mailBulk),
+                    .inputDecoration('Email', FontAwesomeIcons.mailBulk),
               ),
             ),
             const SizedBox(
@@ -266,7 +266,7 @@ class UserController extends GetxController {
                     style: TextStyle(color: AppColors().kTextColor),
                     cursorColor: AppColors().kCursorColor,
                     decoration: InputDecorationWidget().inputDecoration(
-                      'Parola?',
+                      'Parola',
                       FontAwesomeIcons.lock,
                       suffixIcon: IconButton(
                         onPressed: () {

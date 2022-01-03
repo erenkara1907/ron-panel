@@ -135,7 +135,7 @@ class CategoryController extends GetxController {
                 cursorColor: AppColors().kCursorColor,
                 decoration: InputDecorationWidget().inputDecoration(
                     '${categoryListTask[index].title}',
-                    FontAwesomeIcons.question),
+                    FontAwesomeIcons.box),
               ),
             ),
             const SizedBox(
@@ -180,7 +180,7 @@ class CategoryController extends GetxController {
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15.0))),
-                            hint: Text('Lütfen Kategori Belirleyin'),
+                            hint: const Text('Lütfen Kategori Belirleyin'),
                             onChanged: (String? newId) {
                               _settingsController.selectedCategoryId.value =
                                   newId!;
@@ -250,7 +250,7 @@ class CategoryController extends GetxController {
                   style: TextStyle(color: AppColors().kTextColor),
                   cursorColor: AppColors().kCursorColor,
                   decoration: InputDecorationWidget().inputDecoration(
-                      'Başlık?', FontAwesomeIcons.envelopeOpenText)),
+                      'Kategori Adı', FontAwesomeIcons.envelopeOpenText)),
             ),
             const SizedBox(
               height: 10,
