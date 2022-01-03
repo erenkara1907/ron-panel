@@ -43,6 +43,7 @@ class BorrowController extends GetxController {
   GlobalKey<FormState> borrowFormKey = GlobalKey();
 
   var borrowListTask = <ConclusionBorrow>[].obs;
+  var myBorrowListTask = <ConclusionBorrow>[].obs;
 
   @override
   void onInit() async {
@@ -55,6 +56,7 @@ class BorrowController extends GetxController {
   }
 
   Future<BorrowModel?> borrowList() async {
+    myBorrowListTask.clear();
     dataProcessing.value = true;
     await _authManager.bringToken();
     final token = _authManager.token;
@@ -63,6 +65,13 @@ class BorrowController extends GetxController {
     dataProcessing.value = false;
     final newToken = borrowModel!.result!.token!;
     await _authManager.enterToken(newToken);
+    for (int index = 0; index < borrowListTask.length; index++) {
+      if (borrowListTask[index].userId ==
+          _settingsController.settingsModel!.userInfo!.name) {
+        myBorrowListTask.add(borrowListTask[index]);
+      }
+    }
+    print('BORRROW : ${myBorrowListTask.length}');
   }
 
   Future<BorrowModel?> borrowCreate(int userId, int productId,

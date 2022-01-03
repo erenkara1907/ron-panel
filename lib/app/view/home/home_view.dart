@@ -47,13 +47,13 @@ class _HomeViewState extends State<HomeView> {
     await _authManager.bringToken();
     await _settingsController.getSettings();
     await controller.borrowList();
-      await _productController.productList();
-      await _userController.userList();
-      await _categoryController.categoryList();
-      await _departmentController.departmentList();
-      await _statusGroupController.statusGroupList();
-      await _statusController.statusList();
-      await _permissionController.permissionList();
+    await _categoryController.categoryList();
+    await _departmentController.departmentList();
+    await _statusGroupController.statusGroupList();
+    await _statusController.statusList();
+    await _productController.productList();
+    await _userController.userList();
+    await _permissionController.permissionList();
   }
 
   @override
@@ -94,63 +94,84 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Obx(
-        () => Scaffold(
-          drawer: _settingsController.dataProcessing.value == false ? SideBar() : null,
-          appBar: AppBar(
-            title: Text(
-              "Ödünç Aldıklarım",
-              style: AppTextStyle().kTextStyleFourteenWithThemeColor,
-            ),
-            backgroundColor: AppColors().kAppBarBackground,
+      () => Scaffold(
+        drawer: _settingsController.dataProcessing.value == false
+            ? SideBar()
+            : null,
+        appBar: AppBar(
+          title: Text(
+            "Ödünç Aldıklarım",
+            style: AppTextStyle().kTextStyleFourteenWithThemeColor,
           ),
-          body: Obx(
-                () => Skeleton(
-              isLoading: controller.dataProcessing.value,
-              skeleton: SkeletonListView(),
-              child: _settingsController.settingsModel != null
-                  ? ListView.builder(
-                  itemCount: controller.borrowListTask.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return controller.borrowListTask[index].userId ==
-                        _settingsController.settingsModel!.userInfo!.id
-                        ? CardWidget(
-                      title:
-                      controller.borrowListTask[index].description ??
-                          'null',
-                      borderColor: Colors.white,
-                      shadowColor: Colors.white,
-                      children: [
-                        Text(
-                          controller.borrowListTask[index].startDate ??
-                              'null',
-                          style: AppTextStyle().kTextStyleEmail,
-                        ),
-                      ],
-                    )
-                        : const SizedBox();
-                  })
-                  : Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/logo.png',
-                      color: Colors.white,
-                      width: Get.width / 2,
-                      height: Get.height / 8,
-                    ),
-                    Text(
-                      'Yükleniyor..',
-                      style: GoogleFonts.montserrat(
-                          color: Colors.white, fontSize: 14),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
+          backgroundColor: AppColors().kAppBarBackground,
         ),
+        body: Obx(
+          () => controller.myBorrowListTask.isNotEmpty
+              ? Skeleton(
+                  isLoading: controller.dataProcessing.value,
+                  skeleton: SkeletonListView(),
+                  child: _settingsController.settingsModel != null
+                      ? ListView.builder(
+                          itemCount: controller.myBorrowListTask.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return CardWidget(
+                              title: controller
+                                      .myBorrowListTask[index].productId ??
+                                  'null',
+                              borderColor: Colors.white,
+                              shadowColor: Colors.white,
+                              children: [
+                                Text(
+                                  controller.myBorrowListTask[index].userId ??
+                                      'null',
+                                  style: AppTextStyle().kTextStyleEmail,
+                                ),
+                              ],
+                            );
+                          })
+                      : Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/logo.png',
+                                color: Colors.white,
+                                width: Get.width / 2,
+                                height: Get.height / 8,
+                              ),
+                              Text(
+                                'Yükleniyor..',
+                                style: GoogleFonts.montserrat(
+                                    color: Colors.white, fontSize: 14),
+                              )
+                            ],
+                          ),
+                        ),
+                )
+              : Container(
+            padding: const EdgeInsets.all(2),
+            height: Get.height / 8,
+            child: Card(
+                elevation: 2,
+                color: Colors.black,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    side: const BorderSide(
+                      color: Colors.red,
+                    )),
+                child: const Center(
+                  child: ListTile(
+                    title: Text(
+                      'Uyarı',
+                      style: TextStyle(color: Colors.red,fontSize: 20),
+                    ),
+                    subtitle: Text('Ödünç aldığınız herhangi bir ürün bulunamadı')
+                  ),
+                )),
+          )
+        ),
+      ),
     );
   }
 }

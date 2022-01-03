@@ -35,12 +35,12 @@ class BorrowView extends GetView<BorrowController> {
                         itemBuilder: (BuildContext context, int index) {
                           return CardWidget(
                             title:
-                                '${controller.borrowListTask[index].description}',
+                                '${controller.borrowListTask[index].productId}',
                             borderColor: Colors.white,
                             shadowColor: Colors.white,
                             children: [
                               Text(
-                                '${controller.borrowListTask[index].startDate}',
+                                '${controller.borrowListTask[index].userId}',
                                 style: AppTextStyle().kTextStyleEmail,
                               ),
                             ],
