@@ -31,6 +31,7 @@ class CategoryController extends GetxController {
 
   var categoryListTask = <ConclusionCategory>[].obs;
   var dropdownListTask = <ConclusionCategory>[].obs;
+  var reversedCategoryListTask = <ConclusionCategory>[];
 
   late TextEditingController titleController;
   final categoryId = 1.obs;
@@ -52,7 +53,7 @@ class CategoryController extends GetxController {
     final token = _authManager.token;
     categoryModel = await _categoryRepository.categoryList(token!);
     categoryListTask.assignAll(categoryModel!.result!.conclusion!);
-
+    reversedCategoryListTask = categoryListTask.reversed.toList();
     dataProcessing.value = false;
     final newToken = categoryModel!.result!.token!;
     await _authManager.enterToken(newToken);
@@ -110,7 +111,7 @@ class CategoryController extends GetxController {
               titleController.text,
               _settingsController.selectedParentType.value,
               int.parse(_settingsController.selectedCategoryId.value),
-              categoryListTask[index].id!);
+              reversedCategoryListTask[index].id!);
 
           await categoryList();
           titleController.text = '';
@@ -185,7 +186,7 @@ class CategoryController extends GetxController {
                               _settingsController.selectedCategoryId.value =
                                   newId!;
                             },
-                            items: categoryListTask.map((map) {
+                            items: reversedCategoryListTask.map((map) {
                               return DropdownMenuItem<String>(
                                   value: map.id.toString(),
                                   child: Text("${map.title}"));
@@ -220,7 +221,7 @@ class CategoryController extends GetxController {
 
         else {
           Get.back();
-          Get.off(CategoryView());
+          Get.off(() => CategoryView());
           await categoryCreate(
               titleController.text,
               _settingsController.selectedParentType.value,
